@@ -45,9 +45,22 @@ describe('DomainResolver', function () {
         });
 
         context('일치하는 캐시 항목이 없을 경우', function () {
-            it('조회 결과를 반환한다.', function () {
+            beforeEach(function () {
+                $this->gethostbyname->returns('1.1.1.1');
+                $this->cache->set->returns(true);
             });
+
+            it('조회 결과를 반환한다.', function () {
+                $address = $this->resolver->resolve('example.org.');
+
+                expect($address)->toBe('1.1.1.1');
+                $this->gethostbyname->calledWith('example.org.');
+            });
+
             it('캐시 항목을 만든다.', function () {
+                $this->resolver->resolve('example.org.');
+
+                $this->cache->set->calledWith('example.org.', '1.1.1.1');
             });
         });
 
