@@ -37,6 +37,7 @@ describe('DomainResolver', function () {
 
                 $this->gethostbyname->never()->called();
             });
+
             it('캐시 항목을 덮어쓰면 안된다.', function () {
                 $this->resolver->resolve('example.org.');
 
@@ -65,9 +66,25 @@ describe('DomainResolver', function () {
         });
 
         context('도메인 조회에 실패 했을 경우', function () {
-            it('예외를 발생한다.', function () {
+            beforeEach(function () {
+                $this->gethostbyname->returnsArgument();
             });
+
+            it('예외를 발생한다.', function () {
+                $resolve = function () {
+                    $this->resolver->resolve('example.org.');
+                };
+
+                expect($resolve)->toThrow(new \RuntimeException('Unable to resolve.'));
+            });
+
             it('캐시 항목을 만들어서는 안된다.', function () {
+                $resolve = function () {
+                    $this->resolver->resolve('example.org.');
+                };
+
+                expect($resolve)->toThrow();
+                $this->cache->set->never()->called();
             });
         });
 
