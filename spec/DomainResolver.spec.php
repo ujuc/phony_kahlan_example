@@ -21,11 +21,26 @@ describe('DomainResolver', function () {
 
     describe('resolve()', function () {
         context('일치하는 캐시 항목이 있을 경우', function () {
-            it('캐시 항목을 반환할 수 있다.', function () {
+            beforeEach(function () {
+                $this->cache->get->returns('1.1.1.1');
             });
+
+            it('캐시 항목을 반환할 수 있다.', function () {
+                $address = $this->resolver->resolve('example.org.');
+
+                expect($address)->toBe('1.1.1.1');
+                $this->cache->get->calledWith('example.org.');
+            });
+
             it('이름을 다시 확인하려 시도해서는 안된다.', function () {
+                $this->resolver->resolve('example.org.');
+
+                $this->gethostbyname->never()->called();
             });
             it('캐시 항목을 덮어쓰면 안된다.', function () {
+                $this->resolver->resolve('example.org.');
+
+                $this->cache->set->never()->called();
             });
         });
 
