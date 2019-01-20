@@ -89,7 +89,17 @@ describe('DomainResolver', function () {
         });
 
         context('캐시 항목을 만드는데 실패했을 경우', function () {
+            beforeEach(function () {
+                $this->gethostbyname->returns('1.1.1.1');
+                $this->cache->set->returns(false);
+            });
+
             it('예외를 발생한다.', function () {
+                $resolve = function () {
+                    $this->resolver->resolve('example.org.');
+                };
+
+                expect($resolve)->toThrow(new \RuntimeException('Unable to cache.'));
             });
         });
     });
