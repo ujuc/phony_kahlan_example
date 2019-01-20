@@ -2,6 +2,8 @@
 
 namespace Example\Dns;
 
+use function Eloquent\Phony\restoreGlobalFunctions;
+use function Eloquent\Phony\stubGlobal;
 use Psr\SimpleCache\CacheInterface;
 use function Eloquent\Phony\Kahlan\mock;
 
@@ -9,6 +11,12 @@ describe('DomainResolver', function () {
     beforeEach(function () {
         $this->cache = mock(CacheInterface::class);
         $this->resolver = new DomainResolver($this->cache->get());
+
+        $this->gethostbyname = stubGlobal('gethostbyname', __NAMESPACE__);
+    });
+
+    afterEach(function () {
+        restoreGlobalFunctions();
     });
 
     describe('resolve()', function () {
